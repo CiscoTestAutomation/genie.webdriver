@@ -3,6 +3,16 @@
 
 
 devices:
+    # an example for seleniumbox implementation
+    seleniumbox:
+        type: browser
+        connections:
+            webdriver:
+                class: genie.webdriver.connectors.WebDriverConnector
+                driver: "any"
+                version: "any"
+                testname: "TEST"
+                token: "" #seleniumbox token
 
     # the following is an example of firefox browser
     firefox:

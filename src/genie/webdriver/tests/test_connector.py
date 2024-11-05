@@ -75,7 +75,7 @@ devices:
             self.assertTrue(isinstance(conn.driver, MagicMock))
             self.assertIs(conn.connected, True)
 
-    def test_connect_via_arguments(self):
+    def test_connect(self):
         class Dummy():
             pass
 
@@ -83,6 +83,7 @@ devices:
         device.connections = {
             'boom': {
                 'driver': 'Chrome',
+                'chrome_options': '111',
                 'class': 'genie.webdriver.connectors.WebDriverConnector'
             }
         }
@@ -90,17 +91,37 @@ devices:
         with patch('genie.webdriver.connectors.webdriver') as wbd:
             wbd.Chrome().service.process.poll.return_value = None
 
-            option = Options()
-            option.binary_location = '/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta'
+            conn = WebDriverConnector(device=device, alias='dummy', via='boom')
+
+            conn.connect()
+            wbd.Chrome.assert_called_with(chrome_options='111')
+            self.assertTrue(isinstance(conn.driver, MagicMock))
+            self.assertIs(conn.connected, True)
+
+    def test_connect_via_seleniumbox(self):
+        class Dummy():
+            pass
+
+        device = Dummy()
+        device.connections = {
+            'boom': {
+                'driver': 'any',
+                'class': 'genie.webdriver.connectors.WebDriverConnector',
+                'version': "any",
+                'testname': 'TEST',
+                'video' : True, # True to store video
+                'timeout': 18000, # Timeout per test
+                'token': 'boom' #seleniumbox token
+            }
+        }
+
+        with patch('genie.webdriver.connectors.webdriver') as wbd:
 
             conn = WebDriverConnector(device=device,
                                       alias='dummy',
-                                      via='boom',
-                                      options=option)
+                                      via='boom')
 
             conn.connect()
-            wbd.Chrome.assert_called_with(options=option)
-            self.assertIs(conn.options, option)
             self.assertTrue(isinstance(conn.driver, MagicMock))
             self.assertIs(conn.connected, True)
 
